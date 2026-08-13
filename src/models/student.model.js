@@ -25,13 +25,12 @@ const studentSchema = mongoose.Schema({
     }
 })
 
-studentSchema.pre("save", async function(next){
+studentSchema.pre("save", async function(){
     //password modify nhi hua means no new student 
     if(!this.isModified("password")){
-        return next();
+        return;
     }
     this.password = await bcrypt.hash(this.password, 10);
-    next();
 })
 
 

@@ -2,8 +2,16 @@ const express = require("express");
 const app = express();
 
 
-app.get("/",(req,res)=>{
-    res.send("Smart Complaint Management System API");
-})
+app.use(express.json());
 
-module.exports = app
+const studentRouter = require("../src/routes/student.route");
+const complaintRouter = require("../src/routes/compliant.route");
+
+
+app.use("/api", studentRouter);
+
+
+
+app.use("/api", complaintRouter);
+
+module.exports = app;
