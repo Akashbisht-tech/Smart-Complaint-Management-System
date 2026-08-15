@@ -1,11 +1,15 @@
+const mongoose = require("mongoose");
 const complaintModel = require("../models/complaint.model");
 
 async function complaintController(req, res) {
     const {category, description} = req.body;
+    const user = req.user;
 
     const complaint = await complaintModel.create({
         category, 
-        description
+        description,
+        studentId:  user.id
+
     })
 
     res.status(201).json({
@@ -13,4 +17,49 @@ async function complaintController(req, res) {
     })
 }
 
-module.exports = {complaintController};
+async function getComplaints(req, res){
+    const complaints = await complaintModel.find({ studentId: req.user.id });
+    res.status(200).json({
+        message : complaints
+    })
+}
+
+async function getComplaintById(req, res) {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid complaint ID"
+            });
+        }
+
+        const complaint = await complaintModel.findOne({
+            _id: id,
+            studentId: req.user.id
+        });
+
+        if (!complaint) {
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json({
+            message: complaint
+        });
+
+    } catch (error) {
+        console.log("ERROR:", error);
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
+
+module.exports = {
+    complaintController, 
+    getComplaints,
+    getComplaintById
+};
