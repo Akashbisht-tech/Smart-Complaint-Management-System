@@ -58,8 +58,59 @@ async function getComplaintById(req, res) {
 }
 
 
+async function updateComplaintStatus(req, res) {
+    try{
+        const {id} = req.params;
+        const {status} = req.body;
+
+        if(!mongoose.Types.ObjectId.isValid(id)){
+            return res.status(400).json({
+                message: "Invalid complaint ID"
+            });
+        }
+        const allowStatuses = [
+            "pending",
+            "in-progress",
+            "resolved",
+            "rejected"
+        ];
+
+        if(!allowStatuses.includes(status)){
+            return res.status(400).json({
+                message: "Invalid complaint status"
+            });
+        }
+
+        const complaint = await complaintModel.findByIdAndUpdate(
+            id,
+            {status},
+            {new : true}
+        );
+
+        if(!complaint){
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Complaint status updated successfully",
+            complaint
+        });
+
+        
+    } catch(err){
+        console.log(err);
+
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
 module.exports = {
     complaintController, 
     getComplaints,
-    getComplaintById
+    getComplaintById,
+    updateComplaintStatus
 };

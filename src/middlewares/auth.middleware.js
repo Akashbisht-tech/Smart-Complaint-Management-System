@@ -11,12 +11,18 @@ async function authMiddleware(req, res, next){
         });
     }
 
-    console.log(authHeader);
+     // console.log(authHeader);
     const accessToken = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
     req.user = decoded;
     console.log(req.user);
+    
+    // id: "68a123...",
+    // role: "student",
+    // iat: 1755350000,
+    // exp: 175535090
+
     next();
 
     } catch (error) {

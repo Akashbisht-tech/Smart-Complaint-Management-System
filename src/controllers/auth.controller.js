@@ -69,7 +69,7 @@ async function loginController(req, res){
     });
 
 
-    const accessToken = jwt.sign({id : Student._id}, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const accessToken = jwt.sign({id : Student._id, role : Student.role}, process.env.JWT_SECRET, { expiresIn: '15m' });
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -103,6 +103,7 @@ async function refreshTokenController(req, res){
         });
     }
 
+
     const refreshTokenHash = crypto
         .createHash("sha256")
         .update(refreshToken)
@@ -119,8 +120,11 @@ async function refreshTokenController(req, res){
         })
     }
 
+    const student = await studentModel.findById(decoded.id);
+
     const accessToken = jwt.sign({
-        id : decoded.id
+        id : student._id,
+        role : student.role
     }, process.env.JWT_SECRET, 
     {
         expiresIn : "15m"
@@ -128,7 +132,8 @@ async function refreshTokenController(req, res){
     );
 
     const newRefreshToken = jwt.sign({
-        id : decoded.id
+        id : decoded.id,
+        // id : student._id,
     }, process.env.JWT_SECRET, 
     {
         expiresIn : "7d"
