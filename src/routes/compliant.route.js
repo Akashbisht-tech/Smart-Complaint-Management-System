@@ -14,7 +14,12 @@ router.post("/complaint", authMiddleware, complaintController.complaintControlle
 router.get("/getComplaints", authMiddleware, complaintController.getComplaints );
 
 
+
+router.get("/getAllComplaints", authMiddleware, authorizeRole("admin"), complaintController.getAllComplaints );
+
+
 router.get("/complaint/:id", authMiddleware, complaintController.getComplaintById );
+
 
 
 router.patch("/complaints/:id/status",authMiddleware, authorizeRole("admin"),complaintController.updateComplaintStatus);

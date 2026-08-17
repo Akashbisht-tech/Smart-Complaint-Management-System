@@ -108,9 +108,56 @@ async function updateComplaintStatus(req, res) {
     }
 }
 
+async function getAllComplaints(req, res){
+    try{
+        const { status, category, page = 1, limit = 10 } = req.query;
+        const filter = {};
+
+        if(status){
+            filter.status = status;
+        }
+
+        if (category) {
+            filter.category = category;
+        }
+
+
+        // Pagination
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const skip = (pageNumber - 1) * limitNumber;
+
+        const AllComplaints = await complaintModel
+            .find(filter) 
+            .skip(skip)
+            .limit(limitNumber);
+
+            const totalComplaints = await complaintModel.countDocuments(filter);
+            const totalPages = Math.ceil(totalComplaints / limitNumber);
+
+            res.status(200).json({
+            message: AllComplaints,
+            pagination: {
+                currentPage: pageNumber,
+                limit: limitNumber,
+                totalComplaints,
+                totalPages
+            }
+        });
+    }catch(err){
+        res.status(500).json({
+            message: "Failed to fetch complaints"
+        })
+    }
+}
+
+
+
+
 module.exports = {
     complaintController, 
     getComplaints,
     getComplaintById,
-    updateComplaintStatus
+    updateComplaintStatus, 
+    getAllComplaints
 };
