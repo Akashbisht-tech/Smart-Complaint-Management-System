@@ -110,7 +110,7 @@ async function updateComplaintStatus(req, res) {
 
 async function getAllComplaints(req, res){
     try{
-        const { status, category, page = 1, limit = 10 } = req.query;
+        const { status, category, page = 1, limit = 10, search , sort} = req.query;
         const filter = {};
 
         if(status){
@@ -122,6 +122,17 @@ async function getAllComplaints(req, res){
         }
 
 
+        if (search) {
+            filter.description = { $regex: search, $options: "i" };
+        }
+        
+        let sortOption = { createdAt: -1 };
+
+        if (sort === "oldest") {
+            sortOption = {createdAt: 1  };
+        }
+
+
         // Pagination
         const pageNumber = Number(page);
         const limitNumber = Number(limit);
@@ -129,6 +140,7 @@ async function getAllComplaints(req, res){
 
         const AllComplaints = await complaintModel
             .find(filter) 
+            .sort(sortOption)
             .skip(skip)
             .limit(limitNumber);
 
