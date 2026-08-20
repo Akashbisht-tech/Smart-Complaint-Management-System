@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const complaintModel = require("../models/complaint.model");
+const studentModel = require("../models/student.model");
 
 async function complaintController(req, res) {
     const {category, description} = req.body;
@@ -163,6 +164,44 @@ async function getAllComplaints(req, res){
     }
 }
 
+async function ComplaintAssigned(req, res){
+    const {id} = req.params;
+
+    const { assignedTo } = req.body;
+
+    const admin = await studentModel.findById(assignedTo);
+
+    if(!admin){
+        return res.status(404).json({
+            message: "Admin not found"
+        })
+    }
+
+    if(admin.role !== "admin"){
+        return res.status(403).json({
+            message: "User is not an admin"
+        });
+    }
+
+    const complaint = await complaintModel.findByIdAndUpdate(
+        id , 
+        {assignedTo : admin._id},
+        { new: true }
+    )
+    if (!complaint) {
+            return res.status(404).json({
+                message: "Complaint not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Complaint assigned successfully",
+            complaint
+        });
+
+        complaint.save()
+}
+
 
 
 
@@ -171,5 +210,6 @@ module.exports = {
     getComplaints,
     getComplaintById,
     updateComplaintStatus, 
-    getAllComplaints
+    getAllComplaints,
+    ComplaintAssigned
 };

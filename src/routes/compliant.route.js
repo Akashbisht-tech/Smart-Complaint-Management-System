@@ -25,6 +25,10 @@ router.get("/complaint/:id", authMiddleware, complaintController.getComplaintByI
 router.patch("/complaints/:id/status",authMiddleware, authorizeRole("admin"),complaintController.updateComplaintStatus);
 
 
+router.patch("/complaints/:id/assign",authMiddleware, authorizeRole("admin"),complaintController.ComplaintAssigned);
+
+
+
 
 
 

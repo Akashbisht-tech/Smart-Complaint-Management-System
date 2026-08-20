@@ -20,6 +20,12 @@ const complaintSchema = new mongoose.Schema(
             default: "pending"
         },
 
+        assignedTo : {
+            type : mongoose.Schema.Types.ObjectId,
+            ref : "Student",
+            default : null
+        },
+
         studentId: {
             type : mongoose.Schema.Types.ObjectId,
             ref : "Student"
